@@ -54,6 +54,11 @@ if [ ! -f "$DOCS_DIR/README.md" ] && [ -f "$TEMPLATES/README.md" ]; then
   cp "$TEMPLATES/README.md" "$DOCS_DIR/README.md"
 fi
 
+# docs/CHANGELOG.md — append-only log of doc changes, created only if absent
+if [ ! -f "$DOCS_DIR/CHANGELOG.md" ] && [ -f "$TEMPLATES/CHANGELOG.md" ]; then
+  cp "$TEMPLATES/CHANGELOG.md" "$DOCS_DIR/CHANGELOG.md"
+fi
+
 # ---------------------------------------------------------------------------
 # Step 2 — Tier 1: single-file conventions (append/replace marked block)
 # ---------------------------------------------------------------------------

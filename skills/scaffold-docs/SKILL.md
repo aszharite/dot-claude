@@ -100,25 +100,35 @@ bash scripts/init.sh <path-to-project-root>
 This script (see `scripts/init.sh`):
 1. Creates the 7 category folders under `<root>/docs/` if missing (safe on partial structures — never deletes or overwrites existing files).
 2. Copies the matching starter templates and `routing.md` from `templates/<category>/` into each folder **only if that folder is empty** — never overwrites an existing doc.
-3. Detects every AI agent instruction convention present in the repo, checked in this order:
+3. Creates `docs/README.md` (canonical structure explanation) and `docs/CHANGELOG.md` (append-only log of changes to files under `/docs`) if not already present — never overwrites either.
+4. Detects every AI agent instruction convention present in the repo, checked in this order:
    - **Tier 1 (single-file, append block):** `CLAUDE.md`, `AGENTS.md`, `.github/copilot-instructions.md`, `.windsurf/rules/rules.md` or `.windsurfrules`, `.cursorrules` (legacy Cursor), `.clinerules` (file mode), `GEMINI.md`.
    - **Tier 2 (directory, drop a dedicated file):** `.cursor/rules/` → `scaffold-docs.mdc`; `.clinerules/` → `scaffold-docs.md`; `.amazonq/rules/` → `scaffold-docs.md`.
    - Writes to **every** convention found, not just the first — a repo using both Claude Code and Cursor should get both updated. If none are found, it creates `AGENTS.md`.
-4. For Tier 1 targets: inserts or replaces the routing block, delimited by `<!-- scaffold-docs:start -->` / `<!-- scaffold-docs:end -->` markers, so re-running the skill updates the routing table cleanly without duplicating it. For Tier 2 targets: writes (or overwrites, since it's a scaffold-docs-owned file) the dedicated `scaffold-docs.md`/`.mdc` file containing the same routing content.
+5. For Tier 1 targets: inserts or replaces the routing block, delimited by `<!-- scaffold-docs:start -->` / `<!-- scaffold-docs:end -->` markers, so re-running the skill updates the routing table cleanly without duplicating it. For Tier 2 targets: writes (or overwrites, since it's a scaffold-docs-owned file) the dedicated `scaffold-docs.md`/`.mdc` file containing the same routing content.
 
 Run it, then report back to the user exactly which folders/files were created vs. already present, and which convention(s) were written to — don't claim to have created something that already existed.
 
 ## Step 3 — Verify
 
 After running:
-- List `./docs` recursively (e.g. `find ./docs -type f`) to confirm the 7 folders exist with their seed templates and a `routing.md` in each.
+- List `./docs` recursively (e.g. `find ./docs -type f`) to confirm the 7 folders exist with their seed templates and a `routing.md` in each, and that `docs/README.md` and `docs/CHANGELOG.md` exist.
 - Read each detected convention file (e.g. `CLAUDE.md`, `AGENTS.md`) or dedicated file (e.g. `.cursor/rules/scaffold-docs.mdc`) to confirm it was written correctly and, for Tier 1 files, that the marker block isn't duplicated.
 
-**If verification fails** — a category folder is missing, a marker block is duplicated, or a Tier 2 file wasn't written — don't report success. Re-check which convention files actually exist in the repo (Step 1's detection commands) and re-run Step 2; if the same failure recurs, stop and tell the user what's wrong rather than silently leaving a half-scaffolded repo.
+**If verification fails** — a category folder is missing, `docs/CHANGELOG.md` wasn't seeded, a marker block is duplicated, or a Tier 2 file wasn't written — don't report success. Re-check which convention files actually exist in the repo (Step 1's detection commands) and re-run Step 2; if the same failure recurs, stop and tell the user what's wrong rather than silently leaving a half-scaffolded repo.
 
 ## Step 4 — Write into it (if this was triggered by an in-flight doc request)
 
-If you ran this skill because you were about to write a specific doc (a PRD, an ADR, etc.), use the category's `routing.md` to pick the right template (see "Routing a doc request to a template" above), then write that doc into the correct category folder using the seeded template as your starting structure — fill in its frontmatter placeholders (`owner`/`author`, `date`/`updated`, `status`, etc.) along with the body, don't leave `<name>`/`<date>` literal in the real doc. Don't leave the user with just an empty scaffold when they actually asked for content.
+If you ran this skill because you were about to write a specific doc (a PRD, an ADR, etc.), use the category's `routing.md` to pick the right template (see "Routing a doc request to a template" above), then write that doc into the correct category folder using the seeded template as your starting structure — fill in its frontmatter placeholders (`owner`/`author`, `date`/`updated`, `status`, etc.) along with the body, don't leave `<name>`/`<date>` literal in the real doc. Don't leave the user with just an empty scaffold when they actually asked for content. Then record the change in `docs/CHANGELOG.md` — see "Keeping the changelog" below; this applies to every future doc edit under `/docs`, not just this first one.
+
+## Keeping the changelog
+
+`docs/CHANGELOG.md` (seeded in Step 2) is an append-only log of every change made to a file under `/docs`, by an agent or by a human. It exists so anyone can see, at a glance, who touched which doc and why — without digging through version-control history file by file.
+
+- Whenever you (the agent) add, edit, remove, or rename a file under `/docs`, record it in `docs/CHANGELOG.md` in the same change set, using its heading structure: today's date as an `##` heading (most recent date first, at the top of the log), the file's path as a `###` heading under it, then a `**By ...**` attribution line and a one-paragraph summary. If today's date and that file's heading already exist (e.g. a second person edits the same file the same day), append another `**By ...**` + summary pair under the existing heading rather than duplicating it. See the file itself for the exact format and a worked example.
+- Attribution is never a bare agent name: `**By <agent>, obo <name>**` when a specific person asked for the change, `**By <agent>, via <trigger>**` (a CI job, a freshness check, another automation) when it wasn't a direct request. `**By <name>**` alone is fine for a human editing directly. Never write plain `**By Claude**` with no `obo`/`via`.
+- This is not limited to scaffold-docs runs — it applies to every future doc edit in the project, including ones made without this skill being invoked (e.g. filling in an ADR months later). The routing block (below) carries this instruction into the project's agent instructions file so it's visible on every turn, not just while this skill is active.
+- Never edit or delete a past entry — if a doc change is reverted, add a new `**By ...**` + summary entry for the revert instead of erasing the original.
 
 ## The routing block / dedicated file content
 
@@ -142,6 +152,8 @@ Full conventions & full template catalog (75 templates across 7 categories): /do
 | assessing threats/compliance for a feature | /docs/security/threat-model.md | docs/security/templates/threat-model.template.md |
 
 Each category has more scenario-specific templates than shown above (e.g. security also has compliance-checklist, incident-response-plan, vulnerability-assessment; engineering also has rfc, tech-design, data-contract) — check `/docs/<category>/templates/` or `/docs/README.md` when the doc you need isn't one of the 8 above.
+
+Editing, adding, or removing any file under `/docs` (by hand or as an agent)? Record it in `/docs/CHANGELOG.md`, under today's date and that file's heading, in the same change set — see the file itself for the exact format.
 <!-- scaffold-docs:end -->
 ```
 
@@ -156,6 +168,7 @@ If the user wants doc staleness enforcement (not created by default — ask firs
 - Never delete or overwrite a user's existing docs. All operations are additive/idempotent.
 - If the project has a strong reason to deviate from the 7 categories (e.g., a pure infra repo with no "product" surface), say so and propose a trimmed set rather than forcing all 7 — confirm with the user before dropping a category.
 - The `docs/README.md` created by the script is the canonical explanation of the structure; keep every convention's block/file as a thin pointer to it.
+- `docs/CHANGELOG.md`, like `docs/README.md`, is only created if absent and never overwritten on re-run — a project's own history in it is never touched by scaffold-docs itself, only by whoever (agent or human) is instructed to append to it per "Keeping the changelog" above.
 - Tier 2 dedicated files (`.cursor/rules/scaffold-docs.mdc`, etc.) are considered scaffold-docs-owned — safe to overwrite on re-run, unlike Tier 1 files where scaffold-docs only ever touches its own marked block and leaves the rest of the file alone.
 - If the user's setup uses a convention this skill doesn't detect yet, tell them which file/directory wasn't picked up and ask whether to add it, rather than silently skipping it.
 - **Portability guardrail**: don't introduce Claude-Code-only frontmatter fields (e.g. `disable-model-invocation`) or instructions phrased as invoking a specific tool by name — describe the action instead (e.g. "run `X`" or "read `Y`") — this is what keeps the skill definition itself loadable by any harness that's adopted the open Agent Skills spec, not just Claude. Re-run `npx skills-ref validate .` after editing this file.

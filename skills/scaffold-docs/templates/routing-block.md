@@ -14,3 +14,5 @@ Full conventions & full template catalog (75 templates across 7 categories): /do
 | assessing threats/compliance for a feature | /docs/security/threat-model.md | docs/security/templates/threat-model.template.md |
 
 Each category has more scenario-specific templates than shown above (e.g. security also has compliance-checklist, incident-response-plan, vulnerability-assessment; engineering also has rfc, tech-design, data-contract) — check `/docs/<category>/templates/` or `/docs/README.md` when the doc you need isn't one of the 8 above.
+
+Editing, adding, or removing any file under `/docs` (by hand or as an agent)? Record it in `/docs/CHANGELOG.md`, under today's date and that file's heading, in the same change set — see the file itself for the exact format.
