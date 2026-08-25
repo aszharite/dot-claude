@@ -1,16 +1,16 @@
 {
-  "skill_name": "scaffold-docs",
+  "skill_name": "setup-docs",
   "evals": [
     {
       "id": 1,
       "prompt": "I'm starting a new project and want to set up documentation conventions before we write anything.",
-      "expected_output": "Agent runs scaffold-docs against the repo root: creates docs/ with all 7 category folders (product, design, engineering, testing, operations, security, research), each seeded with its templates/ subfolder and a routing.md, plus docs/README.md. No CLAUDE.md/AGENTS.md/other convention file exists yet, so it falls back to creating AGENTS.md with the routing block. Agent reports back exactly which folders/files were created.",
+      "expected_output": "Agent runs setup-docs against the repo root: creates docs/ with all 7 category folders (product, design, engineering, testing, operations, security, research), each seeded with its templates/ subfolder and a routing.md, plus docs/README.md. No CLAUDE.md/AGENTS.md/other convention file exists yet, so it falls back to creating AGENTS.md with the routing block. Agent reports back exactly which folders/files were created.",
       "files": [],
       "expectations": [
         "docs/ contains all 7 category folders, none missing",
         "Each category folder contains a routing.md and a templates/ subfolder with at least one *.template.md file",
         "docs/README.md exists",
-        "AGENTS.md is created (not CLAUDE.md) since no convention existed, and contains the scaffold-docs:start/end marker block",
+        "AGENTS.md is created (not CLAUDE.md) since no convention existed, and contains the setup-docs:start/end marker block",
         "docs/engineering/adr/ is NOT created (real ADRs are only created on first actual use, not seeded)",
         "Agent's final report lists what was created, not a generic 'done'"
       ]
@@ -18,7 +18,7 @@
     {
       "id": 2,
       "prompt": "We need a threat model for the new payments feature. This repo doesn't have any docs folder yet.",
-      "expected_output": "Agent recognizes no doc structure exists, runs scaffold-docs first (per SKILL.md's 'When to use this' — about to write an ad-hoc doc with no doc structure yet), then uses security/routing.md to pick threat-model.template.md (not a different security template), and writes an actual threat model document into docs/security/ for the payments feature — not just an empty scaffold.",
+      "expected_output": "Agent recognizes no doc structure exists, runs setup-docs first (per SKILL.md's 'When to use this' — about to write an ad-hoc doc with no doc structure yet), then uses security/routing.md to pick threat-model.template.md (not a different security template), and writes an actual threat model document into docs/security/ for the payments feature — not just an empty scaffold.",
       "files": [],
       "expectations": [
         "docs/ is scaffolded with all 7 categories as a side effect",
@@ -56,12 +56,12 @@
     {
       "id": 5,
       "prompt": "Set up docs for this repo. It already has a CLAUDE.md with some custom instructions in it, and a .cursor/rules/ directory.",
-      "expected_output": "Agent detects both a Tier 1 convention (CLAUDE.md) and a Tier 2 convention (.cursor/rules/) and writes to both: appends the marked routing block into CLAUDE.md below the existing custom instructions (preserving them untouched), and writes a dedicated scaffold-docs.mdc file into .cursor/rules/ containing the same routing content. It does not fall back to creating AGENTS.md, since at least one convention was found.",
+      "expected_output": "Agent detects both a Tier 1 convention (CLAUDE.md) and a Tier 2 convention (.cursor/rules/) and writes to both: appends the marked routing block into CLAUDE.md below the existing custom instructions (preserving them untouched), and writes a dedicated setup-docs.mdc file into .cursor/rules/ containing the same routing content. It does not fall back to creating AGENTS.md, since at least one convention was found.",
       "files": [],
       "expectations": [
-        "CLAUDE.md's pre-existing custom instructions remain present and unmodified above the scaffold-docs:start marker",
-        "CLAUDE.md contains exactly one scaffold-docs:start/end block",
-        ".cursor/rules/scaffold-docs.mdc is created and contains the routing table content",
+        "CLAUDE.md's pre-existing custom instructions remain present and unmodified above the setup-docs:start marker",
+        "CLAUDE.md contains exactly one setup-docs:start/end block",
+        ".cursor/rules/setup-docs.mdc is created and contains the routing table content",
         "AGENTS.md is NOT created",
         "Agent's report names both files/conventions written to, not just one"
       ]
@@ -69,7 +69,7 @@
     {
       "id": 6,
       "prompt": "Can you write me a README for this repo explaining what it does and how to install it?",
-      "expected_output": "This is a single-file doc request unrelated to project-wide /docs structure. Per SKILL.md's explicit non-goal ('Do NOT use this for single-file doc requests unrelated to project-wide structure'), the agent should NOT trigger scaffold-docs — it should write a normal top-level README.md directly, without scaffolding a docs/ tree or touching any agent-instruction file.",
+      "expected_output": "This is a single-file doc request unrelated to project-wide /docs structure. Per SKILL.md's explicit non-goal ('Do NOT use this for single-file doc requests unrelated to project-wide structure'), the agent should NOT trigger setup-docs — it should write a normal top-level README.md directly, without scaffolding a docs/ tree or touching any agent-instruction file.",
       "files": [],
       "expectations": [
         "No docs/ directory is created",

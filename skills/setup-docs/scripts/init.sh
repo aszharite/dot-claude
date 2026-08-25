@@ -16,8 +16,8 @@ TEMPLATES="$SKILL_DIR/templates"
 DOCS_DIR="$ROOT/docs"
 
 CATEGORIES=(product design engineering testing operations security research)
-START_MARK="<!-- scaffold-docs:start -->"
-END_MARK="<!-- scaffold-docs:end -->"
+START_MARK="<!-- setup-docs:start -->"
+END_MARK="<!-- setup-docs:end -->"
 BLOCK_FILE="$TEMPLATES/routing-block.md"
 
 created_dirs=()
@@ -112,9 +112,9 @@ done
 # ---------------------------------------------------------------------------
 # Each entry: "dir-relative-to-root|filename"
 TIER2_CANDIDATES=(
-  ".cursor/rules|scaffold-docs.mdc"
-  ".clinerules|scaffold-docs.md"
-  ".amazonq/rules|scaffold-docs.md"
+  ".cursor/rules|setup-docs.mdc"
+  ".clinerules|setup-docs.md"
+  ".amazonq/rules|setup-docs.md"
 )
 
 tier2_found=0
@@ -139,7 +139,7 @@ fi
 # ---------------------------------------------------------------------------
 # Summary
 # ---------------------------------------------------------------------------
-echo "--- scaffold-docs summary ---"
+echo "--- setup-docs summary ---"
 echo "Created folders: ${created_dirs[*]:-none}"
 echo "Seeded with templates: ${seeded_dirs[*]:-none}"
 echo "Skipped (already had content): ${skipped_dirs[*]:-none}"

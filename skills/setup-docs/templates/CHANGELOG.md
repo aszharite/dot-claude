@@ -33,7 +33,7 @@ Fixed a typo in the consequences section during review.
 
 ### docs/testing/test-plan.md
 
-**By Claude, via scaffold-docs skill run**
+**By Claude, via setup-docs skill run**
 
 Added a test plan for the billing service covering unit, integration, and load-test coverage.
 

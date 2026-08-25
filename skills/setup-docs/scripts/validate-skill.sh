@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# validate-skill.sh — self-contained checks for the scaffold-docs skill itself.
+# validate-skill.sh — self-contained checks for the setup-docs skill itself.
 #
 # Usage: validate-skill.sh
 #
@@ -174,7 +174,7 @@ else
     fail "docs/README.md created"
   fi
 
-  if [ -f "$TMP_ROOT/AGENTS.md" ] && grep -q "scaffold-docs:start" "$TMP_ROOT/AGENTS.md"; then
+  if [ -f "$TMP_ROOT/AGENTS.md" ] && grep -q "setup-docs:start" "$TMP_ROOT/AGENTS.md"; then
     pass "fallback AGENTS.md created with routing block (no convention present)"
   else
     fail "fallback AGENTS.md created with routing block"
@@ -192,7 +192,7 @@ else
     fail "docs/ file count unchanged on rerun (was $fresh_file_count, now $rerun_file_count)"
   fi
 
-  marker_count="$(grep -c "scaffold-docs:start" "$TMP_ROOT/AGENTS.md" || true)"
+  marker_count="$(grep -c "setup-docs:start" "$TMP_ROOT/AGENTS.md" || true)"
   if [ "$marker_count" = "1" ]; then
     pass "no duplicate marker block in AGENTS.md after rerun"
   else
@@ -206,22 +206,22 @@ else
 
   bash "$INIT_SH" "$TMP_ROOT2" > "$TMP_ROOT2/.run.log" 2>&1 || fail "init.sh exits 0 with multiple conventions present"
 
-  if grep -q "^# existing project rules$" "$TMP_ROOT2/CLAUDE.md" && grep -q "scaffold-docs:start" "$TMP_ROOT2/CLAUDE.md"; then
+  if grep -q "^# existing project rules$" "$TMP_ROOT2/CLAUDE.md" && grep -q "setup-docs:start" "$TMP_ROOT2/CLAUDE.md"; then
     pass "Tier 1: existing CLAUDE.md content preserved, marker block appended"
   else
     fail "Tier 1: existing CLAUDE.md content preserved, marker block appended"
   fi
 
-  if [ -f "$TMP_ROOT2/.cursor/rules/scaffold-docs.mdc" ]; then
-    pass "Tier 2: .cursor/rules/scaffold-docs.mdc written"
+  if [ -f "$TMP_ROOT2/.cursor/rules/setup-docs.mdc" ]; then
+    pass "Tier 2: .cursor/rules/setup-docs.mdc written"
   else
-    fail "Tier 2: .cursor/rules/scaffold-docs.mdc written"
+    fail "Tier 2: .cursor/rules/setup-docs.mdc written"
   fi
 
-  if [ -f "$TMP_ROOT2/.clinerules/scaffold-docs.md" ]; then
-    pass "Tier 2: .clinerules/scaffold-docs.md written"
+  if [ -f "$TMP_ROOT2/.clinerules/setup-docs.md" ]; then
+    pass "Tier 2: .clinerules/setup-docs.md written"
   else
-    fail "Tier 2: .clinerules/scaffold-docs.md written"
+    fail "Tier 2: .clinerules/setup-docs.md written"
   fi
 
   if [ -f "$TMP_ROOT2/AGENTS.md" ]; then
