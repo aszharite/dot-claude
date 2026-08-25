@@ -28,7 +28,7 @@ The full behavioral spec — exact steps, detection order, verification, the rou
 
 ## Skills-changelog plumbing
 
-`docs/CHANGELOG.md`, once scaffolded into a project, is a standing rule (carried by the routing block into that project's own agent-instructions file) that every future doc edit under `/docs` — by a human or an agent — gets logged there: date, file, who (or what automation) drove the change, one-paragraph summary. That log lives in the *target* project, not here; `templates/CHANGELOG.md` in this repo is only the seed.
+`docs/CHANGELOG.md`, once scaffolded into a project, is a standing rule (carried by the routing block into that project's own agent-instructions file) that every future doc edit under `/docs` — by a human or an agent — gets logged there: date, file, who (or what automation) drove the change, the commit SHA(s) that made it, one-paragraph summary. The file's own frontmatter tracks `last_recorded_commit`, the SHA of the newest logged entry — a separate skill or tool can diff from that SHA to `HEAD` on `docs/` to detect drift (doc changes nobody logged) or generate the missing entries. That log lives in the *target* project, not here; `templates/CHANGELOG.md` in this repo is only the seed.
 
 ## Portability
 
