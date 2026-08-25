@@ -5,16 +5,21 @@
 #
 # Run from anywhere; resolves paths relative to this script. Exits non-zero
 # on first failure. Two phases:
-#   1. Frontmatter sanity checks on SKILL.md.
-#   2. Behavioral checks: run init.sh twice against a throwaway temp dir and
-#      assert both a correct fresh scaffold and idempotency on rerun.
+#   1. Shared baseline checks (frontmatter, portability, evals structure) —
+#      delegated to scripts/validate-skills.sh at the repo root, which is
+#      the single source of truth for every skill's generic checks. Add new
+#      generic rules there, not here.
+#   2. Behavioral checks specific to this skill: run init.sh twice against a
+#      throwaway temp dir and assert both a correct fresh scaffold and
+#      idempotency on rerun.
 
 set -euo pipefail
 
 SKILL_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-SKILL_MD="$SKILL_DIR/SKILL.md"
+REPO_ROOT="$(cd "$SKILL_DIR/../.." && pwd)"
 INIT_SH="$SKILL_DIR/scripts/init.sh"
 SKILL_FOLDER_NAME="$(basename "$SKILL_DIR")"
+SHARED_VALIDATOR="$REPO_ROOT/scripts/validate-skills.sh"
 
 CATEGORIES=(product design engineering testing operations security research)
 
@@ -24,76 +29,14 @@ pass () { echo "  PASS: $1"; }
 fail () { echo "  FAIL: $1"; fail_count=$((fail_count + 1)); }
 
 # ---------------------------------------------------------------------------
-# Phase 1 — frontmatter checks
+# Phase 1 — shared baseline checks (see scripts/validate-skills.sh)
 # ---------------------------------------------------------------------------
-echo "--- Phase 1: SKILL.md frontmatter ---"
+echo "--- Phase 1: shared skill baseline (scripts/validate-skills.sh) ---"
 
-if [ ! -f "$SKILL_MD" ]; then
-  fail "SKILL.md exists"
-else
-  pass "SKILL.md exists"
-
-  name_line="$(grep -m1 '^name:' "$SKILL_MD" || true)"
-  if [ -z "$name_line" ]; then
-    fail "frontmatter has 'name:' field"
-  else
-    pass "frontmatter has 'name:' field"
-    frontmatter_name="$(echo "$name_line" | sed -E 's/^name:[[:space:]]*//')"
-    if [ "$frontmatter_name" = "$SKILL_FOLDER_NAME" ]; then
-      pass "frontmatter name matches folder name ($SKILL_FOLDER_NAME)"
-    else
-      fail "frontmatter name '$frontmatter_name' matches folder name '$SKILL_FOLDER_NAME'"
-    fi
-  fi
-
-  desc_line="$(grep -m1 '^description:' "$SKILL_MD" || true)"
-  if [ -z "$desc_line" ]; then
-    fail "frontmatter has 'description:' field"
-  else
-    pass "frontmatter has 'description:' field"
-  fi
-
-  evals_json="$SKILL_DIR/evals/evals.json"
-  if [ ! -f "$evals_json" ]; then
-    fail "evals/evals.json exists (official checklist: at least 3 evaluations)"
-  else
-    pass "evals/evals.json exists"
-    if ! grep -q "\"skill_name\"[[:space:]]*:[[:space:]]*\"$SKILL_FOLDER_NAME\"" "$evals_json"; then
-      fail "evals.json skill_name matches folder name ($SKILL_FOLDER_NAME)"
-    else
-      pass "evals.json skill_name matches folder name"
-    fi
-    eval_count=$(grep -c '"id"[[:space:]]*:' "$evals_json")
-    if [ "$eval_count" -lt 3 ]; then
-      fail "evals.json has at least 3 evaluations (found $eval_count)"
-    else
-      pass "evals.json has at least 3 evaluations (found $eval_count)"
-    fi
-  fi
-
-  # --- portability: skill definition must stay loadable by any harness that
-  # adopted the open Agent Skills spec (agentskills.io), not just Claude Code ---
-  if grep -qE '^\s*disable-model-invocation\s*:' "$SKILL_MD"; then
-    fail "no Claude-Code-only frontmatter extensions (found disable-model-invocation)"
-  else
-    pass "no Claude-Code-only frontmatter extensions"
-  fi
-
-  if grep -qEi 'the [A-Z][a-zA-Z]* tool' "$SKILL_MD"; then
-    fail "no tool-name-specific instructions (found \"the X tool\" phrasing — describe the action instead)"
-  else
-    pass "no tool-name-specific instructions"
-  fi
-
-  if command -v npx >/dev/null 2>&1; then
-    if npx --yes skills-ref validate "$SKILL_DIR" >/dev/null 2>&1; then
-      pass "passes agentskills.io skills-ref validate"
-    else
-      fail "passes agentskills.io skills-ref validate"
-    fi
-  else
-    echo "  SKIP: agentskills.io skills-ref validate (npx not available in this environment)"
-  fi
+if [ ! -f "$SHARED_VALIDATOR" ]; then
+  fail "scripts/validate-skills.sh exists at repo root"
+elif ! bash "$SHARED_VALIDATOR" "$SKILL_FOLDER_NAME"; then
+  fail "shared baseline checks (scripts/validate-skills.sh) — see output above"
 fi
 
 # ---------------------------------------------------------------------------
