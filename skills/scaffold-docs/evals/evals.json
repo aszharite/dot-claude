@@ -1,0 +1,82 @@
+{
+  "skill_name": "scaffold-docs",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I'm starting a new project and want to set up documentation conventions before we write anything.",
+      "expected_output": "Agent runs scaffold-docs against the repo root: creates docs/ with all 7 category folders (product, design, engineering, testing, operations, security, research), each seeded with its templates/ subfolder and a routing.md, plus docs/README.md. No CLAUDE.md/AGENTS.md/other convention file exists yet, so it falls back to creating AGENTS.md with the routing block. Agent reports back exactly which folders/files were created.",
+      "files": [],
+      "expectations": [
+        "docs/ contains all 7 category folders, none missing",
+        "Each category folder contains a routing.md and a templates/ subfolder with at least one *.template.md file",
+        "docs/README.md exists",
+        "AGENTS.md is created (not CLAUDE.md) since no convention existed, and contains the scaffold-docs:start/end marker block",
+        "docs/engineering/adr/ is NOT created (real ADRs are only created on first actual use, not seeded)",
+        "Agent's final report lists what was created, not a generic 'done'"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "We need a threat model for the new payments feature. This repo doesn't have any docs folder yet.",
+      "expected_output": "Agent recognizes no doc structure exists, runs scaffold-docs first (per SKILL.md's 'When to use this' — about to write an ad-hoc doc with no doc structure yet), then uses security/routing.md to pick threat-model.template.md (not a different security template), and writes an actual threat model document into docs/security/ for the payments feature — not just an empty scaffold.",
+      "files": [],
+      "expectations": [
+        "docs/ is scaffolded with all 7 categories as a side effect",
+        "A real threat model document is written under docs/security/ (not just the seed template left untouched)",
+        "The written document's content is specific to 'payments feature', not generic placeholder text",
+        "Frontmatter placeholders (owner/updated/etc.) are filled in on the real doc, not left as literal <name>/<date>",
+        "Agent does not stop after scaffolding alone — it completes the actual doc request"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Set up docs for this project.",
+      "expected_output": "Run once on a repo with no docs/ (creates everything), then the exact same prompt run again on the now-scaffolded repo. The second run must be a no-op: agent detects docs/ already has all 7 categories and the convention file already has the marker block, tells the user it's already scaffolded, and does not duplicate the marker block, does not overwrite any existing template or routing.md, and does not re-report items as 'created' that already existed.",
+      "files": [],
+      "expectations": [
+        "First run creates the full scaffold and routing block as in eval 1",
+        "Second run makes no changes to any existing file's content",
+        "Second run's marker block count in the convention file stays at exactly 1 (no duplication)",
+        "Agent's second-run response explicitly states the repo is already scaffolded rather than silently doing nothing or re-claiming creation"
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "Write up why we chose Postgres over DynamoDB for the new service.",
+      "expected_output": "Agent identifies this as an architectural decision, routes via engineering/routing.md specifically to adr.template.md (not tech-design.template.md or a product-category template), and writes a new numbered ADR at docs/engineering/adr/NNNN-<title>.md documenting the Postgres-vs-DynamoDB decision with Context/Decision/Alternatives considered/Consequences filled in.",
+      "files": [],
+      "expectations": [
+        "The real doc is written to docs/engineering/adr/, not docs/engineering/templates/",
+        "The filename follows the NNNN-title.md convention starting at 0001 (or next available number) if this is the first ADR",
+        "The template used is adr.template.md, evidenced by Context/Decision/Alternatives considered/Consequences section headers",
+        "The Alternatives considered section actually names DynamoDB and why it was not chosen, not left blank",
+        "docs/engineering/adr/ is created only now, on this first real ADR write, not pre-seeded"
+      ]
+    },
+    {
+      "id": 5,
+      "prompt": "Set up docs for this repo. It already has a CLAUDE.md with some custom instructions in it, and a .cursor/rules/ directory.",
+      "expected_output": "Agent detects both a Tier 1 convention (CLAUDE.md) and a Tier 2 convention (.cursor/rules/) and writes to both: appends the marked routing block into CLAUDE.md below the existing custom instructions (preserving them untouched), and writes a dedicated scaffold-docs.mdc file into .cursor/rules/ containing the same routing content. It does not fall back to creating AGENTS.md, since at least one convention was found.",
+      "files": [],
+      "expectations": [
+        "CLAUDE.md's pre-existing custom instructions remain present and unmodified above the scaffold-docs:start marker",
+        "CLAUDE.md contains exactly one scaffold-docs:start/end block",
+        ".cursor/rules/scaffold-docs.mdc is created and contains the routing table content",
+        "AGENTS.md is NOT created",
+        "Agent's report names both files/conventions written to, not just one"
+      ]
+    },
+    {
+      "id": 6,
+      "prompt": "Can you write me a README for this repo explaining what it does and how to install it?",
+      "expected_output": "This is a single-file doc request unrelated to project-wide /docs structure. Per SKILL.md's explicit non-goal ('Do NOT use this for single-file doc requests unrelated to project-wide structure'), the agent should NOT trigger scaffold-docs — it should write a normal top-level README.md directly, without scaffolding a docs/ tree or touching any agent-instruction file.",
+      "files": [],
+      "expectations": [
+        "No docs/ directory is created",
+        "No CLAUDE.md/AGENTS.md/other convention file is modified",
+        "A README.md is written (or updated) at the repo root as a normal, ungated response",
+        "This is a genuinely plausible negative case (a docs-adjacent request), not a trivially unrelated one — it should distinguish 'a project doc structure' from 'a single README file'"
+      ]
+    }
+  ]
+}
