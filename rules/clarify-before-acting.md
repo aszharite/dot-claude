@@ -18,6 +18,8 @@ Before doing any work on a request, identify every decision the request leaves u
 3. **Keep asking until nothing is open.** A request is not ready to execute just because *some* questions got answered — every decision point identified in step 1 needs an explicit answer before you proceed.
 4. **Present the complete plan.** Once every ambiguity is resolved, summarize the full resulting plan — every file to be touched, every command to be run, everything else with an effect — and get that confirmed before making any change. The plan should be the complete solution, not a partial one with more assumptions baked in silently between "clarified" and "executed."
 5. **Then execute.** Only after the plan is confirmed.
+6. **A question is not a green light.** "How can we fix this?", "what would that look like?", "is there a way to...?" are requests for an answer or a plan, not authorization to execute it. Answer or propose; wait for an explicit go-ahead ("do it," "yes," "go ahead") before acting — don't infer approval from the user not having objected to a plan they haven't seen yet.
+7. **Widen the bar for anything outside the repo.** A change confined to files this repo already tracks is at least cheaply reversible (git). A change to anything else — environment variables, files elsewhere on the machine, other applications' state, system settings — is not, and needs an explicit go-ahead in the same turn even when the rest of a plan was already approved. Don't fold an out-of-repo side effect into an in-repo plan's approval.
 
 ## Why this overrides a "just proceed" default
 
