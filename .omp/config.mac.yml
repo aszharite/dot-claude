@@ -1,0 +1,36 @@
+# Mac omp config for dot-claude — symlink ~/.omp/agent/config.yml to this
+# file on Mac workstations. Edit this file, not the symlink target.
+# Windows workstations use config.win.yml instead — shared settings are
+# duplicated between the two rather than composed, on purpose.
+
+# No shellPath override — the system default shell resolves fine on Mac.
+
+modelRoles:
+  default: anthropic/claude-sonnet-5
+
+hideThinkingBlock: false
+
+# --- Styles: render/appearance only, no behavior below this line ---
+symbolPreset: unicode
+
+composer:
+  shape: claude
+
+theme:
+  dark: titanium
+
+statusLine:
+  preset: custom
+  separator: powerline-thin
+  transparent: false
+  sessionAccent: true
+  showHookStatus: true
+  leftSegments:
+    - model
+    - mode
+    - path
+    - git
+  rightSegments:
+    - context_pct
+    - usage
+    - cost

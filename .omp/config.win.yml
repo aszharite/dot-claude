@@ -1,0 +1,37 @@
+# Windows omp config for dot-claude — symlinked from ~/.omp/agent/config.yml
+# on Windows workstations. Edit this file, not the symlink target.
+# Mac workstations use config.mac.yml instead — shared settings are
+# duplicated between the two rather than composed, on purpose.
+
+# Points at git-bash so bash-tool commands run native on Windows.
+shellPath: C:\Program Files\Git\bin\bash.exe
+
+modelRoles:
+  default: anthropic/claude-sonnet-5
+
+hideThinkingBlock: false
+
+# --- Styles: render/appearance only, no behavior below this line ---
+symbolPreset: unicode
+
+composer:
+  shape: claude
+
+theme:
+  dark: titanium
+
+statusLine:
+  preset: custom
+  separator: powerline-thin
+  transparent: false
+  sessionAccent: true
+  showHookStatus: true
+  leftSegments:
+    - model
+    - mode
+    - path
+    - git
+  rightSegments:
+    - context_pct
+    - usage
+    - cost
