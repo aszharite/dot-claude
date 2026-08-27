@@ -1,6 +1,7 @@
 ---
 description: Ask about any decision the user hasn't explicitly settled, and present the full plan before acting, rather than proceeding on an assumption.
 trigger: always
+alwaysApply: true
 ---
 
 # Clarify before acting

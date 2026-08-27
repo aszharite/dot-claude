@@ -1,6 +1,7 @@
 ---
 description: Address the user in a specific way at the start of every response — a lost address is a signal the agent has drifted from the rules.
 trigger: always
+alwaysApply: true
 ---
 
 # Address as

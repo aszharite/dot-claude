@@ -18,6 +18,9 @@
 #      always, glob, agent-requested, manual.
 #   4. `globs:` is present when trigger is `glob`, absent otherwise
 #      (rules/README.md: "Required when trigger: glob, omitted otherwise").
+#   5. `alwaysApply: true` is present when trigger is `always` (the omp
+#      "agents" provider compat field setup-workstation's symlink relies
+#      on — see rules/README.md "Compat fields"), absent otherwise.
 
 set -euo pipefail
 
@@ -82,6 +85,22 @@ check_rule () {
       pass "globs: absent (only used for trigger: glob)"
     else
       fail "globs: absent (only used for trigger: glob, but trigger is '$trigger_value')"
+    fi
+  fi
+
+  local always_apply_line
+  always_apply_line="$(echo "$frontmatter" | grep -m1 '^alwaysApply:' || true)"
+  if [ "$trigger_value" = "always" ]; then
+    if [ "$(echo "${always_apply_line#alwaysApply: }" | xargs || true)" = "true" ]; then
+      pass "alwaysApply: true present (required for trigger: always)"
+    else
+      fail "alwaysApply: true present (required for trigger: always)"
+    fi
+  else
+    if [ -z "$always_apply_line" ]; then
+      pass "alwaysApply: absent (only used for trigger: always)"
+    else
+      fail "alwaysApply: absent (only used for trigger: always, but trigger is '$trigger_value')"
     fi
   fi
 }
