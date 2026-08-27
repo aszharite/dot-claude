@@ -26,10 +26,10 @@
 #   7. A README.md and evals/evals.json are present (repo convention for a
 #      finished skill) — reported as a warning, not a hard failure, since a
 #      skill may still be under active development.
-#   8. If evals/evals.json is present: its skill_name matches the directory
-#      name, and it has at least 3 evaluations — hard failures, since a
-#      malformed evals file that exists is a real defect, not a
-#      still-in-progress skill.
+#   8. Frontmatter has `metadata.version` matching `alpha-N`, `beta-N`,
+#      `rc-N`, or `MAJOR.MINOR` — version lives under `metadata` (not a
+#      top-level key) because the Agent Skills spec's own validator rejects
+#      unrecognized top-level frontmatter fields but allows a `metadata` map.
 
 set -euo pipefail
 
@@ -84,6 +84,17 @@ check_skill () {
     fail "no instructions naming a specific tool (e.g. 'the Read tool')"
   else
     pass "no instructions naming a specific tool by name"
+  fi
+
+  local version_line version_value
+  version_line="$(grep -m1 '^[[:space:]]\+version:' "$skill_md" || true)"
+  version_value="$(echo "${version_line#*version: }" | xargs || true)"
+  if [ -z "$version_line" ]; then
+    fail "frontmatter has a metadata.version field"
+  elif ! echo "$version_value" | grep -qE '^(alpha|beta|rc)-[0-9]+$|^[0-9]+\.[0-9]+$'; then
+    fail "metadata.version matches alpha-N, beta-N, rc-N, or MAJOR.MINOR (found '$version_value')"
+  else
+    pass "metadata.version is valid ('$version_value')"
   fi
 
   if command -v npx >/dev/null 2>&1; then

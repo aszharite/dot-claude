@@ -21,6 +21,9 @@
 #   5. `alwaysApply: true` is present when trigger is `always` (the omp
 #      "agents" provider compat field setup-workstation's symlink relies
 #      on — see rules/README.md "Compat fields"), absent otherwise.
+#   6. Frontmatter has `metadata.version` matching `alpha-N`, `beta-N`,
+#      `rc-N`, or `MAJOR.MINOR` — nested under `metadata` for the same
+#      shape as skills' frontmatter, not because rules have a spec to obey.
 
 set -euo pipefail
 
@@ -102,6 +105,17 @@ check_rule () {
     else
       fail "alwaysApply: absent (only used for trigger: always, but trigger is '$trigger_value')"
     fi
+  fi
+
+  local version_line version_value
+  version_line="$(echo "$frontmatter" | grep -m1 '^[[:space:]]\+version:' || true)"
+  version_value="$(echo "${version_line#*version: }" | xargs || true)"
+  if [ -z "$version_line" ]; then
+    fail "frontmatter has a metadata.version field"
+  elif ! echo "$version_value" | grep -qE '^(alpha|beta|rc)-[0-9]+$|^[0-9]+\.[0-9]+$'; then
+    fail "metadata.version matches alpha-N, beta-N, rc-N, or MAJOR.MINOR (found '$version_value')"
+  else
+    pass "metadata.version is valid ('$version_value')"
   fi
 }
 

@@ -1,6 +1,8 @@
 ---
 name: setup-docs
 description: Scaffolds a standard /docs structure — product, design, engineering, testing, operations, security, research — with starter templates, and adds a routing table to the project's agent instruction file(s) so agents write docs to the right place. Use when starting a new project, or before writing an ad-hoc PRD, ADR, test plan, runbook, or threat model in a repo with no doc conventions yet.
+metadata:
+  version: rc-1
 ---
 
 # setup-docs

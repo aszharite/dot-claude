@@ -1,6 +1,8 @@
 ---
 name: auto-docs
 description: Diagnoses documentation drift by comparing recent project changes against what's documented and updating the affected pages. Works on any repo with a docs directory or changelog, regardless of how it was set up. Use when code changes have landed and docs may now be stale, or when the user asks to sync, refresh, or audit docs against the current state of the codebase.
+metadata:
+  version: rc-1
 ---
 
 # auto-docs

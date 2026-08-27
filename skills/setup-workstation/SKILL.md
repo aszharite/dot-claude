@@ -1,6 +1,8 @@
 ---
 name: setup-workstation
 description: Symlinks this repo's omp config, Claude config, agent config, rules, and skills into the native locations each OS and tool actually reads, so a workstation stays in sync with the repo instead of drifting. Use when setting up a new Windows or Mac workstation for this repo, or after adding/renaming a rule or skill that hasn't been linked in yet.
+metadata:
+  version: rc-1
 ---
 
 # setup-workstation
